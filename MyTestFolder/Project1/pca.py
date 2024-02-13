@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 # Assuming 'student-mat.csv' is in your current working directory
 # Load the dataset
-df = pd.read_csv('MyTestFolder/StudentPerformance/student-mat.csv', sep=';')
+df = pd.read_csv('MyTestFolder/Project1/student-mat-selected.csv', sep=';')
 
 # Selecting continuous variables for PCA
 variables = ['age', 'absences', 'G1', 'G2', 'G3']

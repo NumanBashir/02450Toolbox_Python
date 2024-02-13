@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 
 # Load the dataset
-df = pd.read_csv('MyTestFolder/StudentPerformance/student-mat.csv', sep=';')
+df = pd.read_csv('MyTestFolder/Project1/student-mat-selected.csv', sep=';')
 
 # Select variables
 X = df[['G1', 'G2', 'age', 'absences']]  # Predictors
