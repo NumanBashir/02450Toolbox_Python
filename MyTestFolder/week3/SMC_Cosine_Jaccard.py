@@ -1,28 +1,28 @@
 import numpy as np
 
-# Transcribed dataset from the image
-data = np.array([
-    [1, 1, 1, 0, 0],  # Transaction 1
-    [0, 1, 1, 0, 1]   # Transaction 2
-])
+def calculate_cosine_similarity(vec1, vec2):
+    dot_product = np.dot(vec1, vec2)
+    norm_vec1 = np.linalg.norm(vec1)
+    norm_vec2 = np.linalg.norm(vec2)
+    return dot_product / (norm_vec1 * norm_vec2)
 
-# Define functions to calculate cosine similarity, SMC, and Jaccard coefficient
-def cosine_similarity(x, y):
-    return np.dot(x, y) / (np.sqrt(np.dot(x, x)) * np.sqrt(np.dot(y, y)))
+def calculate_smc(vec1, vec2):
+    matches = np.sum(vec1 == vec2)
+    return matches / len(vec1)
 
-def simple_matching_coefficient(x, y):
-    return np.sum(x == y) / len(x)
+def calculate_jaccard_similarity(vec1, vec2):
+    positive_matches = np.sum(np.logical_and(vec1, vec2))
+    negative_matches = np.sum(np.logical_and(np.logical_not(vec1), np.logical_not(vec2)))
+    return positive_matches / (len(vec1) - negative_matches)
 
-def jaccard_coefficient(x, y):
-    intersection = np.sum(np.logical_and(x, y))
-    union = np.sum(np.logical_or(x, y))
-    return intersection / union
+# Replace these with the actual binary vectors for A and B
+vector_a = np.array([1, 0, 0, 1, 0, 1, 1, 0])
+vector_b = np.array([0, 1, 1, 0, 1, 0, 1, 0])
 
-# Calculate metrics for the two transactions
-cos_sim = cosine_similarity(data[0], data[1])
-smc = simple_matching_coefficient(data[0], data[1])
-jaccard = jaccard_coefficient(data[0], data[1])
+cosine_similarity = calculate_cosine_similarity(vector_a, vector_b)
+smc = calculate_smc(vector_a, vector_b)
+jaccard_similarity = calculate_jaccard_similarity(vector_a, vector_b)
 
-print(cos_sim, smc, jaccard)
-
-print(cos_sim.as_integer_ratio())
+print(f"Cosine Similarity: {cosine_similarity}")
+print(f"Simple Matching Coefficient: {smc}")
+print(f"Jaccard Similarity: {jaccard_similarity}")
