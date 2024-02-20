@@ -16,8 +16,8 @@ def calculate_jaccard_similarity(vec1, vec2):
     return positive_matches / (len(vec1) - negative_matches)
 
 # Replace these with the actual binary vectors for A and B
-vector_a = np.array([1, 0, 0, 1, 0, 1, 1, 0])
-vector_b = np.array([0, 1, 1, 0, 1, 0, 1, 0])
+vector_a = np.array([1,0,1,0,1,0]) #Feel free to write which observation for better overview eg. S1
+vector_b = np.array([1,0,1,0,0,1])
 
 cosine_similarity = calculate_cosine_similarity(vector_a, vector_b)
 smc = calculate_smc(vector_a, vector_b)
