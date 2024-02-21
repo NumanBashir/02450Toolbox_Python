@@ -4,30 +4,33 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 
-# Assuming 'student-mat.csv' is in your current working directory
-# Load the dataset
+# Considering 'G3' as the target variable and 'studytime' as one of the feature
+# We can also consider another feature for visualization, let's take 'absences' for this example
+# Assuming 'absences' is also a numerical feature
+
 df = pd.read_csv('MyTestFolder/Project1/student-mat-selected.csv', sep=';')
+# Extracting the relevant features for PCA
+features_for_pca = df[['studytime', 'absences', 'G3']]
 
-# Selecting continuous variables for PCA
-variables = ['age', 'absences', 'G1', 'G2', 'G3']
-data = df[variables]
-
-# Standardize the data
+# Standardize the features
 scaler = StandardScaler()
-data_scaled = scaler.fit_transform(data)
+X_scaled = scaler.fit_transform(features_for_pca)
 
-# Perform PCA
-pca = PCA(n_components=2)  # Reduce to 2 dimensions for visualization
-principal_components = pca.fit_transform(data_scaled)
+# Apply PCA to reduce to two components for visualization
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X_scaled)
 
-# Create a DataFrame with the principal components
-pca_df = pd.DataFrame(data=principal_components, columns=['PC1', 'PC2'])
+# Assuming we have a binary variable in the dataset that can be used to color the points
+# For demonstration, let's classify 'G3' based on a simple median split
+median_g3 = np.median(df['G3'])
+colors = ['red' if g3 < median_g3 else 'green' for g3 in df['G3']]
 
-# Visualizing the Principal Components
+# Plotting the PCA results
 plt.figure(figsize=(8, 6))
-plt.scatter(pca_df['PC1'], pca_df['PC2'])
+plt.scatter(X_pca[:, 0], X_pca[:, 1], c=colors, alpha=0.5)
+plt.title('2 Component PCA')
 plt.xlabel('Principal Component 1')
 plt.ylabel('Principal Component 2')
-plt.title('PCA of Student Performance Data')
+plt.legend(['Below Median G3', 'Above Median G3'])
 plt.grid(True)
 plt.show()
