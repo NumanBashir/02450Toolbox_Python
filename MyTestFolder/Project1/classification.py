@@ -7,7 +7,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report
 
 # Load the dataset
-df = pd.read_csv('MyTestFolder/Project1/student-mat-selected.csv', sep=';')
+df = pd.read_csv('MyTestFolder/StudentPerformance/student-mat.csv', sep=';')
 
 # Convert 'G3' into a binary variable (e.g., pass/fail)
 df['pass'] = df['G3'].apply(lambda x: 1 if x > 10 else 0)
