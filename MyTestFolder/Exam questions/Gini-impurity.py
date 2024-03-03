@@ -2,18 +2,31 @@
 
 
 # Given values from the image
+
+# N(Parent)
 total_subjects = 306
+# Total survived
 total_survived = 81
+
+# Total not survived
 total_not_survived = 225
 
 # Subjects with positive axillary nodes
+# N(left)
 positive_nodes = 170
+
+# Survived in N(left)
 positive_survived = 62
+
 positive_not_survived = positive_nodes - positive_survived
 
 # Subjects without positive axillary nodes
+# N(right)
 negative_nodes = 136
+
+# Survived in N(right)
 negative_survived = 19
+
 negative_not_survived = negative_nodes - negative_survived
 
 # Function to calculate Gini impurity
