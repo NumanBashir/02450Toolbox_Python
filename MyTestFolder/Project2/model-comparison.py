@@ -1,17 +1,15 @@
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import KFold, cross_val_score, train_test_split
-from sklearn.linear_model import Ridge, LinearRegression
+from sklearn.model_selection import KFold, cross_val_score
+from sklearn.linear_model import Ridge
 from sklearn.neural_network import MLPRegressor
 from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 
-# Load the data
 df = pd.read_csv('MyTestFolder/Project1/student-mat-selected.csv', sep=';')
 
-# Select features and target
 X = df.drop('G3', axis=1)
 y = df['G3']
 
@@ -50,6 +48,7 @@ inner_cv = KFold(n_splits=K2, shuffle=True, random_state=42)
 
 # Parameters to try for Ridge
 ridge_alphas = np.logspace(-4, 4, 10)
+hidden_units_range = [1, 10, 20, 50]  # Including h = 1 as per requirements
 
 # Two-level cross-validation
 for name, model in models.items():
@@ -60,7 +59,6 @@ for name, model in models.items():
         y_train, y_test = y.iloc[train_index], y.iloc[test_index]
         
         if name == 'Ridge':
-            # Inner CV for Ridge
             best_score, best_alpha = -np.inf, None
             for alpha in ridge_alphas:
                 model.alpha = alpha
@@ -69,11 +67,30 @@ for name, model in models.items():
                 if score > best_score:
                     best_score, best_alpha = score, alpha
             model.alpha = best_alpha
+            pipeline = Pipeline(steps=[('preprocessor', preprocessor), ('model', model)])
         
-        # No inner CV for ANN and Baseline, direct training
-        pipeline = Pipeline(steps=[('preprocessor', preprocessor), ('model', model)])
+        elif name == 'ANN':
+            best_score, best_h = -np.inf, None
+            for h in hidden_units_range:
+                ann_model = MLPRegressor(hidden_layer_sizes=(h,),
+                                         max_iter=5000,
+                                         learning_rate_init=0.001,
+                                         solver='adam',
+                                         random_state=42,
+                                         early_stopping=True)
+                pipeline = Pipeline(steps=[('preprocessor', preprocessor), ('model', ann_model)])
+                score = np.mean(cross_val_score(pipeline, X_train, y_train, cv=inner_cv, scoring='neg_mean_squared_error'))
+                if score > best_score:
+                    best_score, best_h = score, h
+            ann_model.set_params(hidden_layer_sizes=(best_h,))
+            pipeline = Pipeline(steps=[('preprocessor', preprocessor), ('model', ann_model)])
+        
+        else:  # For Baseline and other models not requiring inner CV
+            pipeline = Pipeline(steps=[('preprocessor', preprocessor), ('model', model)])
+
+        # Fit and evaluate the model
         pipeline.fit(X_train, y_train)
         y_pred = pipeline.predict(X_test)
         scores.append(mean_squared_error(y_test, y_pred))
-    
+
     print(f'{name}: Mean MSE = {np.mean(scores)}')
