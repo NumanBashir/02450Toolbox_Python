@@ -13,7 +13,6 @@ df = pd.read_csv('MyTestFolder/Project1/student-mat-selected.csv', sep=';')
 X = df.drop('G3', axis=1)
 y = df['G3']
 
-# Preprocessing: Standardize numeric features and One-Hot Encode categorical features
 numeric_features = X.select_dtypes(include=[np.number]).columns.tolist()
 categorical_features = X.select_dtypes(include=['object']).columns.tolist()
 
@@ -23,7 +22,7 @@ preprocessor = ColumnTransformer(
         ('cat', OneHotEncoder(), categorical_features)
     ])
 
-# Baseline model: Linear regression with constant features
+#linear regression
 class BaselineModel:
     def fit(self, X, y):
         self.mean = np.mean(y)
@@ -31,26 +30,25 @@ class BaselineModel:
     def predict(self, X):
         return np.full(shape=(len(X),), fill_value=self.mean)
 
-# ANN model with adjusted parameters for better convergence
+# ANN model
 ann_model = MLPRegressor(max_iter=5000, learning_rate_init=0.001, solver='adam', random_state=42, early_stopping=True)
 
-# Models for comparison
+# models for comparison
 models = {
     'Baseline': BaselineModel(),
     'Ridge': Ridge(),
     'ANN': ann_model
 }
 
-# Set up two-level cross-validation
 K1, K2 = 10, 10
 outer_cv = KFold(n_splits=K1, shuffle=True, random_state=42)
 inner_cv = KFold(n_splits=K2, shuffle=True, random_state=42)
 
-# Parameters to try for Ridge
+#try for Ridge
 ridge_alphas = np.logspace(-4, 4, 10)
-hidden_units_range = [1, 10, 20, 50]  # Including h = 1 as per requirements
+hidden_units_range = [10, 20, 50]  # Adjust based on test runs
 
-# Two-level cross-validation
+# two-level cross-validation
 for name, model in models.items():
     scores = []
     
@@ -85,10 +83,9 @@ for name, model in models.items():
             ann_model.set_params(hidden_layer_sizes=(best_h,))
             pipeline = Pipeline(steps=[('preprocessor', preprocessor), ('model', ann_model)])
         
-        else:  # For Baseline and other models not requiring inner CV
+        else:  
             pipeline = Pipeline(steps=[('preprocessor', preprocessor), ('model', model)])
 
-        # Fit and evaluate the model
         pipeline.fit(X_train, y_train)
         y_pred = pipeline.predict(X_test)
         scores.append(mean_squared_error(y_test, y_pred))
