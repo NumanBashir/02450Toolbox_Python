@@ -1,83 +1,99 @@
+import numpy as np
 import pandas as pd
 from sklearn.model_selection import StratifiedKFold, GridSearchCV
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
+from sklearn.dummy import DummyClassifier
+from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
-from sklearn.metrics import accuracy_score
 
-
+# Load the data
 df = pd.read_csv('MyTestFolder/Project2/student-mat-selected.csv', sep=';')
 
-# Define the features and the target variable
-target_column = 'schoolsup'  
-features = ['age', 'address', 'Pstatus', 'Medu', 'Fedu']
-X = df[features]
+# Define your features and target variable
+target_column = 'schoolsup'  # Update with the actual name of your target column
+X = df.drop(target_column, axis=1)
 y = df[target_column].apply(lambda x: 1 if x == 'yes' else 0)  # Binary encoding for 'yes'/'no'
 
-# Specify the categorical features that need encoding
-categorical_features = ['address', 'Pstatus']
+# Define categorical features for one-hot encoding
+categorical_features = ['age', 'address', 'Pstatus', 'Medu', 'Fedu']  # Update with your actual categorical features
 
-# Create preprocessing steps for the categorical features
-categorical_transformer = Pipeline(steps=[
-    ('onehot', OneHotEncoder(handle_unknown='ignore'))
-])
-
-# Create a column transformer to apply the transformations to the appropriate columns in the DataFrame
+# Preprocessing pipeline for numerical and categorical data
 preprocessor = ColumnTransformer(
     transformers=[
-        ('cat', categorical_transformer, categorical_features)
-    ],
-    remainder='passthrough'
+        ('num', StandardScaler(), X.select_dtypes(exclude=['object']).columns),
+        ('cat', OneHotEncoder(handle_unknown='ignore'), categorical_features)
+    ]
 )
 
-# Create the pipeline
-pipeline = Pipeline(steps=[
-    ('preprocessor', preprocessor),
-    ('scaler', StandardScaler()),
-    ('classifier', LogisticRegression(solver='liblinear', random_state=42))
-])
+# Models setup
+knn = KNeighborsClassifier()
+logistic = LogisticRegression(solver='liblinear')
+baseline = DummyClassifier(strategy='most_frequent')
 
-# Parameters grid for logistic regression
-param_grid = {'classifier__C': [0.01, 0.1, 1, 10, 100]}
+# Parameters grid
+knn_params = {'knn__n_neighbors': range(1, 31)}
+logistic_params = {'logistic__C': np.logspace(-4, 4, 10)}
 
-# Set up the nested cross-validation
+# Pipelines for models
+knn_pipeline = Pipeline(steps=[('preprocessor', preprocessor), ('knn', knn)])
+logistic_pipeline = Pipeline(steps=[('preprocessor', preprocessor), ('logistic', logistic)])
+baseline_pipeline = Pipeline(steps=[('preprocessor', preprocessor), ('baseline', baseline)])
+
+# Cross-validation setup
 outer_cv = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
-inner_cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
-# Lists to store results of cross-validation
-test_error_rates = []
-best_params_list = []
+# Storage for results
+results = []
 
-# Perform the outer cross-validation
-for train_index, test_index in outer_cv.split(X, y):
-    X_train, X_test = X.iloc[train_index], X.iloc[test_index]
-    y_train, y_test = y.iloc[train_index], y.iloc[test_index]
-    
-    # Grid search within the inner cross-validation
-    grid_search = GridSearchCV(pipeline, param_grid, cv=inner_cv, scoring='accuracy')
-    grid_search.fit(X_train, y_train)
-    
-    # Store the best parameters and compute the test error rate
-    best_params = grid_search.best_params_
-    best_params_list.append(best_params)
-    
-    # Predict on the test set using the best model
-    y_pred = grid_search.predict(X_test)
-    test_error_rate = 1 - accuracy_score(y_test, y_pred)
-    test_error_rates.append(test_error_rate)
+# Outer CV
+for fold_idx, (train_idx, test_idx) in enumerate(outer_cv.split(X, y), start=1):
+    # Train-test split
+    X_train, X_test = X.iloc[train_idx], X.iloc[test_idx]
+    y_train, y_test = y.iloc[train_idx], y.iloc[test_idx]
 
-# Construct a DataFrame to display the results
-results_df = pd.DataFrame({
-    'Outer Fold': range(1, 11),
-    'Best Hyperparameter C': [params['classifier__C'] for params in best_params_list],
-    'Test Error Rate': test_error_rates
-})
+    # KNN grid search within an inner CV
+    inner_cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    knn_gs = GridSearchCV(knn_pipeline, knn_params, cv=inner_cv, scoring='accuracy')
+    knn_gs.fit(X_train, y_train)
+
+    # Logistic regression grid search within an inner CV
+    logistic_gs = GridSearchCV(logistic_pipeline, logistic_params, cv=inner_cv, scoring='accuracy')
+    logistic_gs.fit(X_train, y_train)
+
+    # Baseline model fit
+    baseline_pipeline.fit(X_train, y_train)
+
+    # Get the error rate for each model
+    knn_error_rate = 1 - accuracy_score(y_test, knn_gs.predict(X_test))
+    logistic_error_rate = 1 - accuracy_score(y_test, logistic_gs.predict(X_test))
+    baseline_error_rate = 1 - accuracy_score(y_test, baseline_pipeline.predict(X_test))
+
+    # Append results
+    results.append({
+        'Outer fold': fold_idx,
+        'KNN Best K': knn_gs.best_params_['knn__n_neighbors'],
+        'KNN Test Error Rate': knn_error_rate,
+        'Logistic Regression Best C': logistic_gs.best_params_['logistic__C'],
+        'Logistic Regression Test Error Rate': logistic_error_rate,
+        'Baseline Test Error Rate': baseline_error_rate
+    })
+
+# Create a DataFrame from the results
+results_df = pd.DataFrame(results)
+
+# Calculate the mean error rate across all folds
+mean_knn_error = results_df['KNN Test Error Rate'].mean()
+mean_logistic_error = results_df['Logistic Regression Test Error Rate'].mean()
+mean_baseline_error = results_df['Baseline Test Error Rate'].mean()
+
+# Add a row with the mean error rate to the DataFrame
+mean_error_rates = pd.DataFrame([['Mean', '', mean_knn_error, '', mean_logistic_error, mean_baseline_error]],
+                                columns=results_df.columns)
+results_df = pd.concat([results_df, mean_error_rates], ignore_index=True)
 
 # Print and save the results
 print(results_df)
-results_df.to_csv('nested_cv_results.csv', index=False)
-
-# Compute the average test error rate across all outer folds
-average_test_error_rate = sum(test_error_rates) / len(test_error_rates)
-print(f"Average Test Error Rate: {average_test_error_rate:.4f}")
+results_df.to_csv('cross_validation_results.csv', index=False)  # Update the path
