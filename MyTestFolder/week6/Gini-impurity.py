@@ -4,7 +4,7 @@
 # Given values from the image
 
 # N(Parent)
-total_subjects = 306
+total_subjects = 33+28+30+29
 # Total survived
 total_survived = 81
 
