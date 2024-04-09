@@ -23,7 +23,7 @@ X = df.drop('G3', axis=1).values
 y = df['G3'].values
 
 #outer and inner cross-validation
-K1, K2 = 10, 10  # Number of folds
+K1, K2 = 10, 10  #folds
 outer_cv = KFold(n_splits=K1, shuffle=True, random_state=42)
 inner_cv = KFold(n_splits=K2, shuffle=True, random_state=42)
 
