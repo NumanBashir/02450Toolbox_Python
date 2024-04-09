@@ -9,7 +9,7 @@ from sklearn.neural_network import MLPRegressor
 
 df = pd.read_csv('MyTestFolder/Project2/student-mat-selected.csv', sep=';')
 
-# Transform to categorical variables
+#transforming variables to categorical variables
 categorical_columns = df.select_dtypes(include=['object']).columns
 one_hot_encoder = OneHotEncoder()
 encoded_categorical_data = one_hot_encoder.fit_transform(df[categorical_columns]).toarray()
@@ -21,12 +21,11 @@ df = pd.concat([df, encoded_df], axis=1)
 X = df.drop('G3', axis=1).values
 y = df['G3'].values
 
-# Outer and inner cross-validation
+#outer and inner cross-validation
 K1, K2 = 10, 10  # Number of folds
 outer_cv = KFold(n_splits=K1, shuffle=True, random_state=42)
 inner_cv = KFold(n_splits=K2, shuffle=True, random_state=42)
 
-# Initialize lists to store results
 outer_fold_data_size = []
 optimal_hidden_units = []
 optimal_regularization_strength = []
@@ -34,7 +33,6 @@ ann_generalization_errors = []
 ridge_generalization_errors = []
 baseline_generalization_errors = []
 
-# Outer CV loop
 for fold_num, (train_index, test_index) in enumerate(outer_cv.split(X), 1):
     X_train, X_test = X[train_index], X[test_index]
     y_train, y_test = y[train_index], y[test_index]
@@ -46,7 +44,7 @@ for fold_num, (train_index, test_index) in enumerate(outer_cv.split(X), 1):
     best_ann_score = np.inf
     best_ann_model = None
 
-    # Inner CV loop for Ridge regression
+    #Ridge regression
     for alpha in [0.1, 1, 10]:
         ridge_model = Ridge(alpha=alpha)
         ridge_inner_scores = []
@@ -64,8 +62,8 @@ for fold_num, (train_index, test_index) in enumerate(outer_cv.split(X), 1):
             best_ridge_score = average_inner_score
             best_ridge_model = ridge_model
 
-    # Inner CV loop for ANN
-    for h in [1, 5, 10]:  # Hidden units
+    #ANN
+    for h in [1, 5, 10]:  #the hidden units
         ann_model = MLPRegressor(hidden_layer_sizes=(h,), random_state=42)
         ann_inner_scores = []
         for inner_train_index, inner_test_index in inner_cv.split(X_train):
@@ -82,13 +80,13 @@ for fold_num, (train_index, test_index) in enumerate(outer_cv.split(X), 1):
             best_ann_score = average_inner_score
             best_ann_model = ann_model
 
-    # Baseline model
+    #baseline model
     baseline_model = DummyRegressor(strategy='mean')
     baseline_model.fit(X_train, y_train)
     y_pred_baseline = baseline_model.predict(X_test)
     baseline_score = mean_squared_error(y_test, y_pred_baseline)
 
-    # Evaluate best models on outer test set
+    #evaluating best models on outer test set
     best_ridge_model.fit(X_train, y_train)
     y_pred_ridge = best_ridge_model.predict(X_test)
     ridge_score = mean_squared_error(y_test, y_pred_ridge)
@@ -97,16 +95,13 @@ for fold_num, (train_index, test_index) in enumerate(outer_cv.split(X), 1):
     y_pred_ann = best_ann_model.predict(X_test)
     ann_score = mean_squared_error(y_test, y_pred_ann)
 
-    # Store results
     ridge_generalization_errors.append(ridge_score)
     ann_generalization_errors.append(ann_score)
     baseline_generalization_errors.append(baseline_score)
 
-    # Store optimal values
     optimal_hidden_units.append(best_ann_model.hidden_layer_sizes[0])
     optimal_regularization_strength.append(best_ridge_model.alpha)
 
-# Print table
 print("Table 2: Summary of 2-level 10-fold CV for regression")
 print("Outer Fold i\tData Size\tE^test\tANN (h*, Etest)\tLinear regression (λ*, Etest)\tBaseline Etest")
 for i in range(K1):
