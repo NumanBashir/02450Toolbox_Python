@@ -6,6 +6,7 @@ from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.dummy import DummyRegressor
 from sklearn.neural_network import MLPRegressor
+from scipy import stats
 
 df = pd.read_csv('MyTestFolder/Project2/student-mat-selected.csv', sep=';')
 
@@ -107,3 +108,33 @@ print("Outer Fold i\tData Size\tE^test\tANN (h*, Etest)\tLinear regression (λ*,
 for i in range(K1):
     print(f"{i+1}\t\t{outer_fold_data_size[i]}\t\t{ann_generalization_errors[i]}\t\t({optimal_hidden_units[i]}, {ann_generalization_errors[i]})\t\t\t({optimal_regularization_strength[i]}, {ridge_generalization_errors[i]})\t\t\t{baseline_generalization_errors[i]}")
 
+
+
+#paired t-tests
+t_stat_ann_ridge, p_val_ann_ridge = stats.ttest_rel(ann_generalization_errors, ridge_generalization_errors)
+t_stat_ann_baseline, p_val_ann_baseline = stats.ttest_rel(ann_generalization_errors, baseline_generalization_errors)
+t_stat_ridge_baseline, p_val_ridge_baseline = stats.ttest_rel(ridge_generalization_errors, baseline_generalization_errors)
+
+print(f"ANN vs. Ridge: t-statistic = {t_stat_ann_ridge}, p-value = {p_val_ann_ridge}")
+print(f"ANN vs. Baseline: t-statistic = {t_stat_ann_baseline}, p-value = {p_val_ann_baseline}")
+print(f"Ridge vs. Baseline: t-statistic = {t_stat_ridge_baseline}, p-value = {p_val_ridge_baseline}")
+
+#normality check
+_, p_normal_ann = stats.shapiro(ann_generalization_errors)
+_, p_normal_ridge = stats.shapiro(ridge_generalization_errors)
+_, p_normal_baseline = stats.shapiro(baseline_generalization_errors)
+
+print(f"Normality check - ANN errors: p-value = {p_normal_ann}")
+print(f"Normality check - Ridge errors: p-value = {p_normal_ridge}")
+print(f"Normality check - Baseline errors: p-value = {p_normal_baseline}")
+
+#If not then  use wilcoxon signed rank test
+if p_normal_ann < 0.05 or p_normal_ridge < 0.05 or p_normal_baseline < 0.05:
+    print("Normality assumption violated, consider using Wilcoxon signed-rank test.")
+    w_stat_ann_ridge, w_p_val_ann_ridge = stats.wilcoxon(ann_generalization_errors, ridge_generalization_errors)
+    w_stat_ann_baseline, w_p_val_ann_baseline = stats.wilcoxon(ann_generalization_errors, baseline_generalization_errors)
+    w_stat_ridge_baseline, w_p_val_ridge_baseline = stats.wilcoxon(ridge_generalization_errors, baseline_generalization_errors)
+
+    print(f"Wilcoxon - ANN vs. Ridge: statistic = {w_stat_ann_ridge}, p-value = {w_p_val_ann_ridge}")
+    print(f"Wilcoxon - ANN vs. Baseline: statistic = {w_stat_ann_baseline}, p-value = {w_p_val_ann_baseline}")
+    print(f"Wilcoxon - Ridge vs. Baseline: statistic = {w_stat_ridge_baseline}, p-value = {w_p_val_ridge_baseline}")
