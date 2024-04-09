@@ -106,3 +106,4 @@ print("Table 2: Summary of 2-level 10-fold CV for regression")
 print("Outer Fold i\tData Size\tE^test\tANN (h*, Etest)\tLinear regression (λ*, Etest)\tBaseline Etest")
 for i in range(K1):
     print(f"{i+1}\t\t{outer_fold_data_size[i]}\t\t{ann_generalization_errors[i]}\t\t({optimal_hidden_units[i]}, {ann_generalization_errors[i]})\t\t\t({optimal_regularization_strength[i]}, {ridge_generalization_errors[i]})\t\t\t{baseline_generalization_errors[i]}")
+
