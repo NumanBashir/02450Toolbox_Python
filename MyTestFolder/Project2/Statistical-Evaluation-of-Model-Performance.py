@@ -10,10 +10,8 @@ from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 
-
 df = pd.read_csv('MyTestFolder/Project2/student-mat-selected.csv', sep=';')
 
-# Identify categorical and numerical columns (adjust as necessary)
 categorical_columns = df.select_dtypes(include=['object']).columns.tolist()
 numeric_columns = df.select_dtypes(include=[np.number]).columns.tolist()
 target_column = 'G3'  
@@ -22,28 +20,23 @@ target_column = 'G3'
 if target_column in numeric_columns:
     numeric_columns.remove(target_column)
 
-# Define the column transformer for preprocessing
 column_transformer = ColumnTransformer(transformers=[
     ('cat', OneHotEncoder(), categorical_columns),
     ('num', StandardScaler(), numeric_columns)
 ])
 
-# Define feature matrix X and target vector y
 X = df.drop(target_column, axis=1)
 y = df[target_column].astype(int)
 
-# Define error rate function
 def error_rate(y_true, y_pred):
     return np.sum(y_true != y_pred) / len(y_true)
 
-# Custom scorer for cross-validation
 error_rate_scorer = make_scorer(error_rate, greater_is_better=False)
 
 # Initialize the KFold cross-validation settings
 n_splits = 10
 kf = KFold(n_splits=n_splits, shuffle=True, random_state=42)
 
-# Initialize models
 knn_pipeline = Pipeline(steps=[('preprocess', column_transformer),
                                ('knn', KNeighborsClassifier())])
 logistic_pipeline = Pipeline(steps=[('preprocess', column_transformer),
@@ -76,7 +69,6 @@ stats_knn_logistic = compute_correlated_t_test(diff_knn_logistic)
 stats_knn_baseline = compute_correlated_t_test(diff_knn_baseline)
 stats_logistic_baseline = compute_correlated_t_test(diff_logistic_baseline)
 
-# Output the results
 print('KNN vs Logistic:', stats_knn_logistic)
 print('KNN vs Baseline:', stats_knn_baseline)
 print('Logistic vs Baseline:', stats_logistic_baseline)
