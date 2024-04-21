@@ -32,3 +32,21 @@ ard_o5_solution = density_o5 / ((density_o4 + density_o6) / 2)
 
 print("ARD: " + str(ard_o5_solution))
 
+# To make the script more readable, let's define a function that creates the proximity matrix and prints it in a readable format.
+
+def create_and_print_proximity_matrix(distance_matrix):
+    # Invert the distances to create proximity values, avoid division by zero
+    proximity_matrix = 1 / np.where(distance_matrix > 0, distance_matrix, np.inf)
+    # Set the diagonal to zeros
+    np.fill_diagonal(proximity_matrix, 0)
+    
+    # Convert the proximity matrix to a string with rounded values for better readability
+    proximity_matrix_str = np.array2string(proximity_matrix, precision=3)
+    
+    print("Proximity Matrix:\n" + proximity_matrix_str)
+
+# Call the function with the corrected distance matrix
+print(create_and_print_proximity_matrix(correct_distance_matrix))
+
+
+
