@@ -1,0 +1,33 @@
+# Given the correct pairwise distances from the provided matrix
+import numpy as np
+
+# Taken from F19_Q6
+
+# Numbers have been changed in o1, o2, o6, o8,
+
+correct_distance_matrix = np.array([
+    [0.0, 1.3, 8.3, 3.9, 3.8, 2.4, 6.3, 2.7, 7.1, 4.9],
+    [1.3, 0.0, 7.4, 2.6, 3.0, 2.3, 5.3, 2.2, 6.6, 4.6],
+    [4.1, 3.2, 0.0, 6.3, 7.1, 2.7, 2.8, 1.6, 2.4, 5.3],
+    [3.8, 3.1, 6.3, 0.0, 1.5, 2.5, 4.1, 1.3, 5.3, 2.4],
+    [4.5, 4.7, 7.1, 1.5, 0.0, 3.1, 4.9, 3.7, 5.8, 3.2],
+    [2.4, 2.3, 5.5, 1.6, 2.4, 0.0, 3.7, 1.2, 4.8, 2.3],
+    [3.2, 2.6, 2.8, 4.1, 4.9, 1.8, 0.0, 1.0, 1.9, 3.6],
+    [2.7, 2.2, 5.4, 1.8, 2.8, 1.2, 3.8, 0.0, 4.9, 2.1],
+    [3.0, 2.7, 2.4, 5.3, 5.8, 0.9, 1.9, 1.1, 0.0, 4.4],
+    [3.9, 4.2, 5.3, 2.4, 3.2, 2.8, 3.6, 3.6, 4.4, 0.0]
+])
+
+# Function to calculate the density based on the provided formula
+def calculate_density(distances, K):
+    return 1 / np.mean(np.sort(distances)[1:K+1])  # Exclude the zero distance (self)
+
+# Calculate the densities for o5 and its two nearest neighbors (o4 and o6)
+# o5 index is 4, o4 index is 3, and o6 index is 5 in zero-indexed Python
+density_o1 = calculate_density(correct_distance_matrix[0], K=3)
+# density_o2 = calculate_density(correct_distance_matrix[1], K=3)
+# density_o6 = calculate_density(correct_distance_matrix[5], K=3)
+# density_o8 = calculate_density(correct_distance_matrix[7], K=3)
+
+print("Density of o1")
+print(density_o1)
