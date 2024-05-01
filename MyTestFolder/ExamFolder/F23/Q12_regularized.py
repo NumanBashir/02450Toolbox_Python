@@ -21,7 +21,7 @@ w0 = np.mean(y)  # Since the formula was w0 = 1/5 * sum(yi), which simplifies to
 w1 = np.sum(x_standardized * (y - w0)) / (np.sum(x_standardized**2) + lambda_)
 
 # Predicting for x2 (value at index 1 in the original x array, corresponding to -1.3)
-x2_standardized = (-1.3 - mu) / sigma 
+x2_standardized = (-1.3 - mu) / sigma # This needs to be looked in the table to make sure it is the right number
 y_pred = w1 * x2_standardized + w0
 
 print("w0:", w0)
