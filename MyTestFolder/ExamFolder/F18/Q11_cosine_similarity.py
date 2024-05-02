@@ -1,6 +1,6 @@
 import numpy as np
 
-# Texts
+# TODO: Change this
 s1 = "the bag of words representation should not give you a hard time"
 s2 = "remember the representation should be a vector"
 
