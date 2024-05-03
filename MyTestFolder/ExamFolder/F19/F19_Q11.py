@@ -21,16 +21,16 @@ from itertools import combinations
 # ]
 
 binarized_data = np.array([
-    [1, 1, 0, 0, 0, 1, 0, 0, 0, 1],  # o1
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # o2
-    [1, 1, 0, 0, 0, 1, 0, 0, 0, 1],  # o3
-    [0, 1, 1, 1, 0, 0, 0, 1, 1, 0],  # o4
-    [1, 1, 0, 0, 0, 1, 0, 0, 0, 1],  # o5
-    [0, 1, 1, 1, 0, 0, 1, 1, 1, 0],  # o6
-    [1, 1, 1, 0, 0, 1, 1, 1, 1, 0],  # o7
-    [0, 1, 1, 1, 0, 1, 1, 0, 0, 1],  # o8
-    [0, 0, 0, 0, 1, 1, 1, 0, 1, 1],  # o9
-    [1, 0, 0, 0, 0, 1, 1, 1, 1, 0]  # o10
+    [0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1],  # o1
+    [1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1],  # o2
+    [1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0],  # o3
+    [0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0],  # o4
+    [0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0],  # o5
+    [0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0],  # o6
+    [1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 0],  # o7
+    [0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0],  # o8
+    [1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 0],  # o9
+    [0, 1, 1, 1, 1, 0, 0, 1, 0, 1, 0],  # o10    
 ])
 
 
@@ -41,7 +41,7 @@ data_array = np.array(binarized_data)
 supports = data_array.mean(axis=0)
 
 # Find features with support greater than 0.65
-features_above_threshold = np.nonzero(supports > 0.55)[0]
+features_above_threshold = np.nonzero(supports > 0.65)[0]
 
 # Generate all non-empty combinations of features above the threshold
 all_combinations = []
@@ -50,7 +50,7 @@ for i in range(1, len(features_above_threshold)+1):
     for combination in combinations_i:
         # Calculate support for each combination
         itemset_support = data_array[:, combination].all(axis=1).mean()
-        if itemset_support > 0.55:
+        if itemset_support > 0.65:
             # Adjust the index to match the feature numbering f1, f2, ..., f11
             adjusted_combination = [index + 1 for index in combination]
             all_combinations.append(adjusted_combination)
