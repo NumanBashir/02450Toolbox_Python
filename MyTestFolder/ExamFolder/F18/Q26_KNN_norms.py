@@ -29,7 +29,7 @@ def plot_decision_boundary(X, y, p, subplot):
     subplot.set_title(f"2-Class classification (p={p})")
 
 # Training data: two points
-X = np.array([[0.301, 0.514], [0.34, 0.672]])
+X = np.array([[0.301, 0.514], [0.34, 0.672]]) # TODO CHANGE THESE NUMBERS FROM THE QUESTION
 y = np.array([0, 1])  # Class labels
 
 # Create a figure with subplots for each p-norm
