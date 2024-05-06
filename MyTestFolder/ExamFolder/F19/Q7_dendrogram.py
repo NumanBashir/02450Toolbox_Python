@@ -50,6 +50,9 @@ condensed_matrix = squareform(correct_distance_matrix)
 # TODO: If the question is minimum/single linkage use 'single' otherwise if maximum/complete linkage use 'complete' in the second parameter
 # maximum = complete
 # minimum = single
+# = average
+# = weighted
+# = centroid
 linked = linkage(condensed_matrix, 'single')
 
 # Plot the dendrogram
