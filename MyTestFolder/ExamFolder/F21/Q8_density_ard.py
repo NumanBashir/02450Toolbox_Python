@@ -22,7 +22,7 @@ def calculate_density(distances, K):
 
 # Calculate the densities for o5 and its two nearest neighbors (o4 and o6)
 # o5 index is 4, o4 index is 3, and o6 index is 5 in zero-indexed Python
-# TODO YOU NEED TO WRITE DOWN THE K NUMBER OF NEAREST NEIGHBORS, IN THIS QUESTION IT WAS K=3, WHY 
+# TODO YOU NEED TO WRITE DOWN THE K NUMBER OF NEAREST NEIGHBORS, IN THIS QUESTION IT WAS K=3, WHY WE WRITE DOWN THE THREE NEAREST NEIGHBORS
 
 density_o5 = calculate_density(correct_distance_matrix[4], K=3) # THE OBSERVATION WE ARE LOOKING AT 
 
