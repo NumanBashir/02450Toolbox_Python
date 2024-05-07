@@ -1,48 +1,47 @@
 import numpy as np
 
-binarized_data = np.array([
-    [0, 0, 0, 1, 0, 0, 0, 1],  # o1
-    [0, 0, 1, 0, 0, 1, 0, 1],  # o2
-    [0, 0, 1, 0, 0, 1, 0, 1],  # o3
-    [0, 1, 0, 0, 0, 1, 0, 1],  # o4
-    [0, 0, 0, 0, 0, 1, 0, 1],  # o5
-    [0, 0, 1, 0, 1, 1, 0, 1],  # o6
-    [0, 0, 1, 0, 0, 1, 0, 1],  # o7
-    [1, 1, 0, 0, 0, 0, 1, 1],  # o8
-    [0, 1, 0, 0, 0, 0, 0, 1],  # o9
-    [0, 1, 0, 0, 0, 1, 0, 1],  # o10
-    [1, 1, 0, 0, 0, 0, 0, 0],  # o11
+# Data from the table, with class labels assigned based on the provided information
+data = np.array([
+    [0, 0, 0, 1, 0, 0, 0, 1],  # o1 -> C1
+    [0, 0, 1, 0, 0, 1, 0, 1],  # o2 -> C1
+    [0, 0, 1, 0, 0, 1, 0, 1],  # o3 -> C2
+    [0, 1, 0, 0, 0, 1, 0, 1],  # o4 -> C2
+    [0, 0, 0, 0, 0, 1, 0, 1],  # o5 -> C2
+    [0, 0, 1, 0, 1, 1, 0, 1],  # o6 -> C2
+    [0, 0, 1, 0, 0, 1, 0, 1],  # o7 -> C2
+    [1, 1, 0, 0, 0, 0, 1, 1],  # o8 -> C3
+    [0, 1, 0, 0, 0, 0, 0, 1],  # o9 -> C3
+    [0, 1, 0, 0, 0, 1, 0, 1],  # o10 -> C3
+    [1, 1, 0, 0, 0, 0, 0, 0],  # o11 -> C3
 ])
 
-# Given class probabilities at the root node
-p_C1 = 2 / 11  # 2 out of 11 for C1
-p_C2 = 5 / 11  # 5 out of 11 for C2
-p_C3 = 4 / 11  # 4 out of 11 for C3
+# Class labels as described
+class_labels = np.array([1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3])
 
-# Gini impurity at the root
-I_r = 1 - (p_C1**2 + p_C2**2 + p_C3**2)
+# Gini impurity calculation
+def gini_impurity(classes):
+    _, counts = np.unique(classes, return_counts=True)
+    probabilities = counts / counts.sum()
+    return 1 - np.sum(probabilities ** 2)
 
-# Class probabilities in each group after split on f2
-# Group 1 (f2 = 0)
-p_C1_v1 = 6 / 6
-p_C2_v1 = 0 / 6
-p_C3_v1 = 0 / 6
-I_v1 = 1 - (p_C1_v1**2 + p_C2_v1**2 + p_C3_v1**2)
+# Compute Gini impurity for the root node
+root_impurity = gini_impurity(class_labels)
 
-# Group 2 (f2 = 1)
-p_C1_v2 = 0 / 5
-p_C2_v2 = 4 / 5
-p_C3_v2 = 1 / 5
-I_v2 = 1 - (p_C1_v2**2 + p_C2_v2**2 + p_C3_v2**2)
+# Compute Gini impurities for the split on f2
+mask_f2_0 = data[:, 1] == 0
+mask_f2_1 = data[:, 1] == 1
 
-# Weighted Gini impurity after split
-weighted_I = (6 / 11) * I_v1 + (5 / 11) * I_v2
+gini_f2_0 = gini_impurity(class_labels[mask_f2_0])
+gini_f2_1 = gini_impurity(class_labels[mask_f2_1])
 
-# Gini impurity gain
-delta_I = I_r - weighted_I
+# Calculate the proportions for weighted average
+prop_f2_0 = mask_f2_0.sum() / len(class_labels)
+prop_f2_1 = mask_f2_1.sum() / len(class_labels)
 
-print("Initial Gini Impurity:", I_r)
-print("Gini Group 1:", I_v1)
-print("Gini Group 2:", I_v2)
-print("Weighted Gini After Split:", weighted_I)
-print("Gini Gain:", delta_I)
+# Weighted Gini impurity after the split
+weighted_gini = prop_f2_0 * gini_f2_0 + prop_f2_1 * gini_f2_1
+
+# Impurity gain from the split
+gini_gain = root_impurity - weighted_gini
+
+print(root_impurity, gini_f2_0, gini_f2_1, weighted_gini, gini_gain)

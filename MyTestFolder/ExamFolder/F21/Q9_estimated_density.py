@@ -14,22 +14,44 @@ correct_distance_matrix = np.array([
     [109.8, 131.5, 89.1, 60.0, 78.9, 91.0, 89.4, 24.2, 60.7, 39.4, 0.0]
 ])
 
-# Distances from o11 to all other points
-distances_o11 = correct_distance_matrix[10]  # last row in the matrix, zero-based index
-sorted_distances = np.sort(distances_o11)
+# Distances for observation o11 from the distance matrix
+distances_o11 = correct_distance_matrix[10]  # Index 10 corresponds to o11
 
-# Pick the two smallest non-zero distances
-closest_distances = sorted_distances[1:3]  # start from 1 to avoid the zero distance to itself
+# Identify the two smallest distances (excluding the distance to itself, which is 0)
+sorted_indices = np.argsort(distances_o11)
+closest_two_indices = sorted_indices[1:3]  # Skip the first one as it is the distance to itself
 
-# Given parameters
-lambda_width = 20
-n = 2  # Using the two closest observations
+# Distances of the two closest observations to o11
+closest_distances = distances_o11[closest_two_indices]
 
-# Calculate kernel density estimate
-def gaussian_kernel(x, lambda_width):
-    return (1 / (np.sqrt(2 * np.pi) * lambda_width)) * np.exp(- (x ** 2) / (2 * lambda_width ** 2))
+# Number of features M
+M = 8
 
-# Density at o11 using the two closest observations
-density_estimate = np.sum(gaussian_kernel(closest_distances, lambda_width)) / n
+# Bandwidth lambda
+lambda_ = 20
 
-print("Estimated density at o11:", density_estimate)
+# Gaussian kernel density estimation
+kde_estimate = (1 / (2 * np.sqrt((2 * np.pi * lambda_**2)**M))) * np.sum(np.exp(-closest_distances**2 / (2 * lambda_**2)))
+
+print(kde_estimate, closest_distances)
+
+
+# TODO CHECK THESE OPTIONS FROM THE ANSWERS 
+lambda_ = 20
+M = 8
+two_pi_lambda_squared = (2 * np.pi * lambda_**2)**M
+
+# Calculate the denominator for the density estimations
+denominator = np.sqrt(two_pi_lambda_squared)
+
+# Compute the estimates for each option
+option_A = 0.5 / denominator * 0.6246
+option_B = 0.5 / denominator * 1.922
+option_C = 1 / denominator * 0.6246
+option_D = 1 / denominator * 1.922
+
+print("A: ", option_A)
+print("B: ", option_B)
+print("C: ", option_C)
+print("D: ", option_D)
+
