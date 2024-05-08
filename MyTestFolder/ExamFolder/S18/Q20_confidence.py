@@ -16,8 +16,8 @@ binarized_data = np.array([
 ])
 
 # Antecedent and consequent indices (zero-based)
-antecedent_indices = [3, 5, 7, 9]  # f1, f3, f8, f9
-consequent_indices = [11]    # f2, f6, f7
+antecedent_indices = [3, 5, 7, 9] 
+consequent_indices = [11]   
 
 # Calculate support of the antecedent
 antecedent_support = np.all(binarized_data[:, antecedent_indices], axis=1)
@@ -26,6 +26,8 @@ support_A = np.sum(antecedent_support)
 # Calculate support of both antecedent and consequent
 full_rule_support = np.all(binarized_data[:, antecedent_indices + consequent_indices], axis=1)
 support_A_and_B = np.sum(full_rule_support)
+
+print(support_A)
 
 # Calculate confidence
 confidence = support_A_and_B / support_A if support_A else 0
