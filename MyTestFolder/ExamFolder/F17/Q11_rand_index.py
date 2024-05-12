@@ -1,7 +1,7 @@
 def calculate_rand_index():
     # Define the cluster indices and true class labels
-    cluster_indices = [1, 2, 1, 1, 1, 3, 1, 1, 1, 1] # TODO LOOK AT THE TASK IT SAY HOW MANY CLUSTERS THERE ARE AND LABEL THEM --> 3 CLUSTERS --> O6 AND O2 ARE IN THEIR OWN CLUSTERS
-    true_labels = [1, 2, 1, 1, 1, 2, 2, 2, 2, 1] # TODO LABELS LISTED IN THE TASK
+    cluster_indices = [1, 1, 1, 1, 1, 2, 2, 2, 2, 2] # TODO LOOK AT THE TASK IT SAY HOW MANY CLUSTERS THERE ARE AND LABEL THEM --> 2 CLUSTERS
+    true_labels = [1, 1, 1, 1, 2, 2, 2, 1, 1, 2] # TODO LABELS LISTED IN THE TASK
 
     # Initialize counts
     f11 = 0  # same class, same cluster
