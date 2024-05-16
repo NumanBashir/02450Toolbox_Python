@@ -24,16 +24,30 @@ V = np.array([
 
 # Hypothetical observations for the given options
 observations = {
-    'A': np.array([0.301, 0.514, 0.672, 0.340, 0.564]),
-    'B': np.array([0.672, 0.301, 0.514, 0.340, 0.564]),
-    'C': np.array([0.301, 0.672, 0.514, 0.340, 0.564]),
-    'D': np.array([0.514, 0.301, 0.672, 0.340, 0.564])
+    'A': np.array([0, -1, 1, 1, -1]),
+    'B': np.array([1, 0, -1, 1, -1]),
+    'C': np.array([1, -1, 0, -1, 0]),
+    'D': np.array([-1, -1, 0, -1, -1])
 }
 
-# Choose the principal component to project onto (zero-based index)
-component_index = 0  # Change this based on the question's focus (e.g., for the second component use 1)
+# Function to calculate projection onto principal components
+def calculate_projections(observation, V):
+    projections = np.dot(V.T, observation)
+    return projections
 
-# Calculate and print the projections for each observation
+# Calculate and print projections for each observation
 for label, obs in observations.items():
-    projection = project_onto_component(V, obs, component_index)
-    print(f"Projection of observation {label} onto component {component_index + 1}: {projection}")
+    projections = calculate_projections(obs, V)
+    print(f'Projections for observation {label}: {projections}')
+
+# Determine the sign of the projections for the specified principal components
+for label, obs in observations.items():
+    projections = calculate_projections(obs, V)
+    if label == 'A':
+        print(f"Observation A: Projection onto PC1: {projections[0]}")
+    if label == 'B':
+        print(f"Observation B: Projection onto PC4: {projections[3]}")
+    if label == 'C':
+        print(f"Observation C: Projection onto PC2: {projections[1]}")
+    if label == 'D':
+        print(f"Observation D: Projection onto PC1: {projections[0]}")
