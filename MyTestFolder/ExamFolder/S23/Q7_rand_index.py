@@ -1,5 +1,5 @@
 import numpy as np
-from sklearn.metrics import rand_score
+from sklearn.metrics import rand_score, jaccard_score
 
 # Ground-truth clustering Z (using class labels)
 Z = np.array([1, 1, 1, 1, 2, 2, 2, 2, 2, 2])
