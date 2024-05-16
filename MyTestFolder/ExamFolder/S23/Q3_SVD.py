@@ -4,6 +4,7 @@ import numpy as np
 
 # For future questions make sure to check which coordinates they want to change. In this the numbers were v1.3, v2.5 and s2.2
 
+# TODO CHANGE THESE VALUES ACCORDING TO THE QUESTION OPTIONS
 v1 = -0.3413
 v2 = -0.6508
 V = np.array([
