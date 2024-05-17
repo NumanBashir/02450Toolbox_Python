@@ -1,9 +1,7 @@
 import numpy as np
 
-# DOES NOT WORK YET!!!!
-
-# Provided data and class labels
-data = np.array([
+# Table 5: Poverty dataset
+table5 = np.array([
     [1, 1, 1, 0, 0],  # o1
     [1, 1, 1, 0, 0],  # o2
     [1, 1, 1, 0, 0],  # o3
@@ -17,37 +15,40 @@ data = np.array([
     [0, 1, 0, 1, 1],  # o11
 ])
 
-class_labels = np.array([0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1])
+# classes (color coded as 0: red, 1: black)
+y = np.array([0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1])
 
-# Function to calculate Gini impurity
-def gini_impurity(labels):
-    _, counts = np.unique(labels, return_counts=True)
+# Calculate Gini impurity
+def gini_impurity(y):
+    classes, counts = np.unique(y, return_counts=True)
     probabilities = counts / counts.sum()
-    gini = 1 - np.sum(probabilities ** 2)
-    return gini
+    return 1 - np.sum(probabilities ** 2)
 
-# Calculate the Gini impurity for the whole dataset
-gini_full = gini_impurity(class_labels)
+# Initial Gini impurity
+I_r = gini_impurity(y)
 
-# Split the dataset based on the median value of the first feature
-median_value = np.median(data[:, 0])
-left_split = class_labels[data[:, 0] <= median_value]
-right_split = class_labels[data[:, 0] > median_value]
+# Split the dataset based on the feature x1
+left_split = y[table5[:, 0] == 0]
+right_split = y[table5[:, 0] == 1]
 
-# Calculate the Gini impurity for the splits
-gini_left = gini_impurity(left_split)
-gini_right = gini_impurity(right_split)
+# Gini impurity for each split
+I_v_left = gini_impurity(left_split)
+I_v_right = gini_impurity(right_split)
 
-# Calculate the weighted average Gini impurity of the splits
-weight_left = len(left_split) / len(class_labels)
-weight_right = len(right_split) / len(class_labels)
-gini_split = weight_left * gini_left + weight_right * gini_right
+# Number of samples in each split
+N = len(y)
+N_left = len(left_split)
+N_right = len(right_split)
 
-# Calculate the purity gain
-purity_gain = gini_full - gini_split
+# Weighted Gini impurity after the split
+I_split = (N_left / N) * I_v_left + (N_right / N) * I_v_right
 
-print("Gini impurity of the full dataset:", gini_full)
-print("Gini impurity of the left split:", gini_left)
-print("Gini impurity of the right split:", gini_right)
-print("Weighted Gini impurity of the split:", gini_split)
-print("Purity gain:", purity_gain)
+# Purity gain Δ
+delta = I_r - I_split
+
+# Print results
+print(f"Initial Gini impurity: {I_r:.3f}")
+print(f"Gini impurity left split: {I_v_left:.3f}")
+print(f"Gini impurity right split: {I_v_right:.3f}")
+print(f"Weighted Gini impurity after split: {I_split:.3f}")
+print(f"Purity gain Δ: {delta:.3f}")
