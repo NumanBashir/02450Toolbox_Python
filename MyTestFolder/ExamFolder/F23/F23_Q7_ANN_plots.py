@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Define the tanh activation function
+# TODO MAKE SURE TO CHECK WHICH ACTIVATION FUNCTION TO USE
 def tanh(x):
     return np.tanh(x)
 
