@@ -37,20 +37,26 @@ gmm_options = {
 # Function to sample from a Gaussian Mixture Model
 def sample_gmm(gmm_params, num_samples=1000):
     samples = []
-    for weight, mean, cov in zip(gmm_params['weights'], gmm_params['means'], gmm_params['covariances']):
+    labels = []
+    for cluster_idx, (weight, mean, cov) in enumerate(zip(gmm_params['weights'], gmm_params['means'], gmm_params['covariances'])):
         num_samples_cluster = int(num_samples * weight)
         samples_cluster = np.random.multivariate_normal(mean, cov, num_samples_cluster)
         samples.append(samples_cluster)
-    return np.vstack(samples)
+        labels.append(np.full(num_samples_cluster, cluster_idx))
+    return np.vstack(samples), np.hstack(labels)
 
 # Function to plot samples from a GMM
 def plot_gmm_samples(gmm_params, num_samples=1000, title=''):
-    samples = sample_gmm(gmm_params, num_samples)
+    samples, labels = sample_gmm(gmm_params, num_samples)
     plt.figure(figsize=(8, 6))
-    plt.scatter(samples[:, 0], samples[:, 1], alpha=0.5)
+    colors = ['r', 'g', 'b']
+    for cluster_idx in range(len(gmm_params['weights'])):
+        cluster_samples = samples[labels == cluster_idx]
+        plt.scatter(cluster_samples[:, 0], cluster_samples[:, 1], alpha=0.5, color=colors[cluster_idx], label=f'Cluster {cluster_idx + 1}')
     plt.title(title)
     plt.xlabel('x')
     plt.ylabel('y')
+    plt.legend()
     plt.grid(True)
     plt.show()
 
