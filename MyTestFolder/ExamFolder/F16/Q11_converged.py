@@ -12,3 +12,5 @@ clusters = kmeans.labels_
 
 # Print the cluster assignments
 print("Cluster Assignments:", clusters)
+
+# THE NUMBER IN THE PRINT INDICATES THE CLUSTER ASSIGNMENTS FOR EACH DATA POINT
